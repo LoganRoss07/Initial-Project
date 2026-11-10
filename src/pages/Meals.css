@@ -1,0 +1,44 @@
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.macro-value {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.macro-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+.macro-inputs .field {
+  min-width: 0;
+}
+
+.macro-inputs label {
+  font-size: 0.9rem;
+}
+
+.meal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.btn-small {
+  min-height: 44px;
+  padding: 0 14px;
+}
