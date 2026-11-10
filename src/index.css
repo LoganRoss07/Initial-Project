@@ -88,3 +88,16 @@ label {
     transition: none !important;
   }
 }
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.routine-name {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+}

@@ -1,0 +1,37 @@
+.timer {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight:700;
+    font-variant-numeric: tabular-nums;
+}
+
+.set-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 44px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.set-head {
+    font-size: 0.8rem;
+    font-weigth: 700;
+    color: var(--muted);
+}
+
+.set-row input[type='checkbox'] {
+    width: 28px;
+    min-height: 28px;
+    justify-self: center;
+}
+
+.error {
+    color: #b91c1c;
+    font-weight: 700px;
+}
+
+.actions {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0;
+}
