@@ -42,3 +42,47 @@
   min-height: 44px;
   padding: 0 14px;
 }
+
+.food-results {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.food-result {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  text-align: left;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.food-result[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.food-result span {
+  display: block;
+}
+
+.food-amount {
+  margin-top: 16px;
+}
+
+.food-note {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

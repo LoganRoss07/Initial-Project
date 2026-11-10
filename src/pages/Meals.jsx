@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { addMeal, deleteMeal, getMealsByDate } from '../db/db'
+import { searchFood } from '../services/foodApi'
 import Card from '../components/Card'
 import { toDateString } from '../utils/dates'
 import { calculateDailyTotals } from '../utils/meals'
@@ -13,10 +14,68 @@ function Meals() {
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
 
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState([])
+  const [searching, setSearching] = useState(false)
+  const [searchMessage, setSearchMessage] = useState('')
+  const [selectedFood, setSelectedFood] = useState(null)
+  const [grams, setGrams] = useState('100')
+
   const meals = useLiveQuery(() => getMealsByDate(date), [date])
 
   function handleChange(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
+  }
+
+  async function handleSearch(event) {
+    event.preventDefault()
+
+    if (query.trim().length < 2) {
+      setSearchMessage('Type at least 2 characters to search.')
+      return
+    }
+
+    setSearching(true)
+    setSearchMessage('')
+    setResults([])
+    setSelectedFood(null)
+
+    try {
+      const found = await searchFood(query)
+      setResults(found)
+      if (found.length === 0) {
+        setSearchMessage('No foods found. Try another word, or enter the meal by hand below.')
+      }
+    } catch (err) {
+      setSearchMessage(err.message)
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  function applyFood(food, gramsValue) {
+    const factor = Number(gramsValue) / 100
+    if (!(factor > 0)) return
+
+    setForm({
+      name: `${food.name} (${Number(gramsValue)} g)`,
+      calories: String(Math.round(food.per100g.calories * factor)),
+      protein: String(Math.round(food.per100g.protein * factor * 10) / 10),
+      carbs: String(Math.round(food.per100g.carbs * factor * 10) / 10),
+      fat: String(Math.round(food.per100g.fat * factor * 10) / 10),
+    })
+    setError('')
+  }
+
+  function chooseFood(food) {
+    setSelectedFood(food)
+    setGrams('100')
+    applyFood(food, '100')
+  }
+
+  function handleGramsChange(value) {
+    setGrams(value)
+    if (selectedFood) applyFood(selectedFood, value)
   }
 
   async function handleSubmit(event) {
@@ -44,6 +103,7 @@ function Meals() {
     try {
       await addMeal({ date, name, calories, protein, carbs, fat })
       setForm(emptyForm)
+      setSelectedFood(null)
       setError('')
     } catch {
       setError('Could not save your meal. Please try again.')
@@ -80,6 +140,83 @@ function Meals() {
             <p className="macro-value">{Math.round(totals.fat)} g</p>
           </div>
         </div>
+      </Card>
+
+      <Card title="Find a food">
+        <form onSubmit={handleSearch} noValidate>
+          <div className="field">
+            <label htmlFor="food-search">Search for a food</label>
+            <input
+              id="food-search"
+              type="search"
+              value={query}
+              placeholder="e.g. banana, porridge oats"
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-full" disabled={searching}>
+            {searching ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {searching && (
+          <p role="status" className="food-note">
+            Looking up foods. This can take a few seconds.
+          </p>
+        )}
+
+        {searchMessage && (
+          <p role="alert" className="error">
+            {searchMessage}
+          </p>
+        )}
+
+        {results.length > 0 && (
+          <ul className="food-results">
+            {results.map((food, index) => (
+              <li key={`${food.code}-${index}`}>
+                <button
+                  type="button"
+                  className="food-result"
+                  aria-pressed={selectedFood === food}
+                  onClick={() => chooseFood(food)}
+                >
+                  <span className="activity-name">{food.name}</span>
+                  <span className="activity-meta">
+                    {food.brand ? `${food.brand} - ` : ''}
+                    {Math.round(food.per100g.calories)} kcal per 100 g
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {selectedFood && (
+          <div className="field food-amount">
+            <label htmlFor="food-grams">Amount eaten (g)</label>
+            <input
+              id="food-grams"
+              type="number"
+              inputMode="decimal"
+              min="1"
+              step="any"
+              value={grams}
+              onChange={(e) => handleGramsChange(e.target.value)}
+            />
+            <p className="food-note">
+              The meal form below has been filled in. Check it, then press Add meal.
+            </p>
+          </div>
+        )}
+
+        <p className="food-note">
+          Food data from{' '}
+          <a href="https://world.openfoodfacts.org" target="_blank" rel="noreferrer">
+            Open Food Facts
+          </a>
+          .
+        </p>
       </Card>
 
       <Card title="Add a meal">
