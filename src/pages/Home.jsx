@@ -102,7 +102,8 @@ function Home() {
                   <p className="activity-name">{workout.routineName}</p>
                   <p className="activity-meta">
                     {formatDate(workout.date)} - {workout.exercises.length}{' '}
-                    exercises - {workout.durationMinutes} min
+                    {workout.exercises.length === 1 ? 'exercise' : 'exercises'} -{' '}
+                    {workout.durationMinutes} min
                   </p>
                 </div>
                 <span aria-hidden="true">›</span>
