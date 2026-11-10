@@ -1,0 +1,13 @@
+.scanner {
+  margin-top: 16px;
+}
+
+.scanner-view {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scanner .btn {
+  margin-top: 12px;
+}

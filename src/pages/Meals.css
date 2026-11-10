@@ -86,3 +86,11 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.barcode-actions {
+  margin-top: 12px;
+}
+
+.barcode-form {
+  margin-top: 16px;
+}

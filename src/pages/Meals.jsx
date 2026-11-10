@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { addMeal, deleteMeal, getMealsByDate } from '../db/db'
-import { searchFood } from '../services/foodApi'
+import { searchFood, getProductByBarcode } from '../services/foodApi'
 import Card from '../components/Card'
+import BarcodeScanner from '../components/BarcodeScanner'
 import { toDateString } from '../utils/dates'
 import { calculateDailyTotals } from '../utils/meals'
 import './Meals.css'
@@ -20,6 +21,9 @@ function Meals() {
   const [searchMessage, setSearchMessage] = useState('')
   const [selectedFood, setSelectedFood] = useState(null)
   const [grams, setGrams] = useState('100')
+
+  const [showScanner, setShowScanner] = useState(false)
+  const [barcodeInput, setBarcodeInput] = useState('')
 
   const meals = useLiveQuery(() => getMealsByDate(date), [date])
 
@@ -76,6 +80,41 @@ function Meals() {
   function handleGramsChange(value) {
     setGrams(value)
     if (selectedFood) applyFood(selectedFood, value)
+  }
+
+  async function handleBarcode(code) {
+    setShowScanner(false)
+    setSearching(true)
+    setSearchMessage('')
+    setResults([])
+    setSelectedFood(null)
+
+    try {
+      const food = await getProductByBarcode(code)
+      if (!food) {
+        setSearchMessage(
+          'That barcode was not found, or it has no calorie information. Try searching by name or enter the meal by hand.'
+        )
+      } else {
+        setResults([food])
+        chooseFood(food)
+      }
+    } catch (err) {
+      setSearchMessage(err.message)
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  function handleBarcodeSubmit(event) {
+    event.preventDefault()
+    const code = barcodeInput.trim()
+
+    if (!/^\d{6,14}$/.test(code)) {
+      setSearchMessage('Enter the digits printed under the barcode (6 to 14 numbers).')
+      return
+    }
+    handleBarcode(code)
   }
 
   async function handleSubmit(event) {
@@ -156,6 +195,41 @@ function Meals() {
           </div>
           <button type="submit" className="btn btn-full" disabled={searching}>
             {searching ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        <div className="barcode-actions">
+          <button
+            type="button"
+            className="btn btn-secondary btn-full"
+            aria-expanded={showScanner}
+            onClick={() => setShowScanner((open) => !open)}
+          >
+            {showScanner ? 'Hide scanner' : 'Scan a barcode'}
+          </button>
+        </div>
+
+        {showScanner && (
+          <BarcodeScanner
+            onDetected={handleBarcode}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
+
+        <form onSubmit={handleBarcodeSubmit} noValidate className="barcode-form">
+          <div className="field">
+            <label htmlFor="barcode-number">Or type a barcode number</label>
+            <input
+              id="barcode-number"
+              type="text"
+              inputMode="numeric"
+              value={barcodeInput}
+              placeholder="e.g. 3017620422003"
+              onChange={(e) => setBarcodeInput(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-secondary btn-full" disabled={searching}>
+            Look up barcode
           </button>
         </form>
 
