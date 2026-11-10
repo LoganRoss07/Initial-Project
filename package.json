@@ -12,6 +12,7 @@
   "dependencies": {
     "chart.js": "^4.6.1",
     "dexie": "^4.4.7",
+    "dexie-react-hooks": "^4.4.0",
     "firebase": "^13.2.0",
     "html5-qrcode": "^2.3.8",
     "react": "^19.3.1",
