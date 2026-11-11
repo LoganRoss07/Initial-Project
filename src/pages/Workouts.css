@@ -1,0 +1,60 @@
+.workouts-section {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.routine-groups {
+  margin: 0 0 4px;
+  color: var(--muted);
+}
+
+.exercise-list {
+  margin: 8px 0 16px;
+  padding-left: 20px;
+}
+
+.routine-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.exercise-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.exercise-name {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.remove-exercise {
+  min-width: 44px;
+}
+
+.editor-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.history-item {
+  display: block;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.history-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
