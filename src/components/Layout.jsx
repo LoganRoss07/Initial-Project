@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db/db'
@@ -26,16 +26,22 @@ function Layout() {
   const avatar = useLiveQuery(() => getSetting('avatar', null))
   const theme = useLiveQuery(() => getSetting('theme', 'light'))
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light'
-  }, [theme])
-
   const title = pathname.startsWith('/workout/')
     ? 'Workout'
     : titles[pathname] || ''
 
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light'
+  }, [theme])
+
+  useEffect(() => {
+    document.title = title ? `${title} - Gym Tracker` : 'Gym Tracker'
+  }, [title])
+
   return (
     <div className="app">
+      <a href="#main" className="skip-link">Skip to content</a>
+
       <header className="app-header">
         <div>
           <p className="app-name">Gym Tracker</p>
@@ -46,8 +52,10 @@ function Layout() {
         </Link>
       </header>
 
-      <main className="app-main">
-        <Outlet />
+      <main className="app-main" id="main" tabIndex={-1}>
+        <Suspense fallback={<p role="status">Loading...</p>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <nav className="bottom-nav" aria-label="Main">
