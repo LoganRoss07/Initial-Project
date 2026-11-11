@@ -1,14 +1,5 @@
 import Dexie from 'dexie'
 
-export const db = new Dexie('GymTrackerDB')
-
-db.version(1).stores({
-  routines: '++id, name',
-  workouts: '++id, date',
-  meals: '++id, date',
-  settings: 'key',
-})
-
 const defaultRoutines = [
   {
     name: 'Push Day',
@@ -50,9 +41,32 @@ const defaultRoutines = [
   },
 ]
 
-db.on('populate', () => {
-  db.routines.bulkAdd(defaultRoutines)
-})
+function createDatabase(name) {
+  const database = new Dexie(name)
+
+  database.version(1).stores({
+    routines: '++id, name',
+    workouts: '++id, date',
+    meals: '++id, date',
+    settings: 'key',
+  })
+
+  database.on('populate', () => {
+    database.routines.bulkAdd(defaultRoutines)
+  })
+
+  return database
+}
+
+// The current database. Other files always see the latest one.
+export let db = createDatabase('GymTrackerDB-guest')
+
+export function openDatabaseForUser(uid) {
+  const name = `GymTrackerDB-${uid}`
+  if (db.name === name) return
+  db.close()
+  db = createDatabase(name)
+}
 
 // Routines
 export const getRoutines = () => db.routines.toArray()

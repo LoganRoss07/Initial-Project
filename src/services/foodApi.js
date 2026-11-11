@@ -66,7 +66,6 @@ async function searchModern(query) {
     `${SEARCH_URL}?q=${encodeURIComponent(query)}` +
     `&langs=en&page_size=15&fields=${FIELDS}`
   const data = await fetchJson(url)
-  console.log('Search response', data) // TEMPORARY: delete once search works
   return data?.hits || data?.products || []
 }
 
