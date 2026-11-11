@@ -31,21 +31,18 @@ const ranges = [
 ]
 
 function ChartCard({ title, labels, values, unit, emptyText }) {
-  if (values.length === 0) {
-    return (
-      <Card title={title}>
-        <p>{emptyText}</p>
-      </Card>
-    )
-  }
+  const styles = getComputedStyle(document.documentElement)
+  const accent = styles.getPropertyValue('--accent').trim() || '#2563eb'
+  const textColor = styles.getPropertyValue('--muted').trim() || '#4b5563'
+  const gridColor = styles.getPropertyValue('--border').trim() || '#d1d5db'
 
   const data = {
     labels,
     datasets: [
       {
         data: values,
-        borderColor: '#2563eb',
-        backgroundColor: '#2563eb',
+        borderColor: accent,
+        backgroundColor: accent,
         tension: 0.3,
       },
     ],
@@ -55,7 +52,10 @@ function ChartCard({ title, labels, values, unit, emptyText }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true } },
+    scales: {
+      x: { ticks: { color: textColor }, grid: { color: gridColor } },
+      y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } },
+    },
   }
 
   return (

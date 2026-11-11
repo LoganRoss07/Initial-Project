@@ -23,6 +23,10 @@
 
 .segment.selected {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 700;
+}
+
+:root[data-theme='dark'] .segment.selected {
+  color: #000000 !important;
 }

@@ -93,3 +93,35 @@ export async function getSetting(key, fallback) {
   return row ? row.value : fallback
 }
 export const saveSetting = (key, value) => db.settings.put({ key, value })
+
+export async function exportAllData() {
+  const [routines, workouts, meals, settings] = await Promise.all([
+    db.routines.toArray(),
+    db.workouts.toArray(),
+    db.meals.toArray(),
+    db.settings.toArray(),
+  ])
+  return {
+    exportedAt: new Date().toISOString(),
+    routines,
+    workouts,
+    meals,
+    settings: settings.filter((setting) => setting.key !== 'avatar'),
+  }
+}
+
+export async function deleteAllData() {
+  await db.transaction('rw', db.routines, db.workouts, db.meals, db.settings, async () => {
+    await db.routines.clear()
+    await db.workouts.clear()
+    await db.meals.clear()
+    await db.settings.clear()
+    await db.routines.bulkAdd(
+      defaultRoutines.map((routine) => ({
+        name: routine.name,
+        muscleGroups: routine.muscleGroups,
+        exercises: routine.exercises,
+      }))
+    )
+  })
+}
